@@ -1,0 +1,15 @@
+<h1>{{game.word.Word}}</h1>
+<form novalidate>
+    <h2>{{message}}</h2>
+
+    <ul>
+        <li ng-repeat="value in game.word.Options">
+            <input type="radio" name="answer" value="{{$index}}" id="a{{$index}}" ng-model="$parent.answer" required="required" />
+            <label for="a{{$index}}">{{value}}</label><br/>
+        </li>
+    </ul>
+
+    <div>
+        <button name="submit" type="submit" ng-click="save(game.gameId, game.word, answer)")>submit</button>
+    </div>
+</form>

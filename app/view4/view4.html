@@ -1,0 +1,11 @@
+<h1>add</h1>
+<form novalidate>
+    <h2>{{message}}</h2>
+
+    <input type="text" ng-model="words.word1" required="required"/>
+    <input type="text" ng-model="words.word2" required="required"/>
+
+    <div>
+        <button name="submit" type="submit" ng-click="save(words)")>submit</button>
+    </div>
+</form>
