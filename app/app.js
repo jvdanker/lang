@@ -2,6 +2,7 @@
 
 // Declare app level module which depends on views, and components
 angular.module('myApp', [
+  'ngMaterial',
   'ngRoute',
   'myApp.view1',
   'myApp.view2',
@@ -9,7 +10,9 @@ angular.module('myApp', [
   'myApp.view4',
   'myApp.version'
 ]).
-config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
+config(['$mdThemingProvider', '$locationProvider', '$routeProvider', function($mdThemingProvider, $locationProvider, $routeProvider) {
+  $mdThemingProvider.theme('default').dark();
+
   $locationProvider.hashPrefix('!');
 
   $routeProvider.otherwise({redirectTo: '/view1'});
