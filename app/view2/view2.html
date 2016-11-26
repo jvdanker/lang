@@ -1,15 +1,17 @@
-<h1>{{game.word.Word}}</h1>
-<form novalidate>
-    <h2>{{message}}</h2>
-
-    <ul>
-        <li ng-repeat="value in game.word.Options">
-            <input type="radio" name="answer" value="{{$index}}" id="a{{$index}}" ng-model="$parent.answer" required="required" />
-            <label for="a{{$index}}">{{value}}</label><br/>
-        </li>
-    </ul>
-
-    <div>
-        <button name="submit" type="submit" ng-click="save(game.gameId, game.word, answer)")>submit</button>
+<md-toolbar layout="row" class="md-hue-3">
+    <div class="md-toolbar-tools">
+        <span>{{game.word.Word}}</span>
     </div>
-</form>
+</md-toolbar>
+
+
+<md-list flex>
+    <md-subheader class="md-no-sticky">{{game.word.Word}}</md-subheader>
+    <md-list-item class="md-3-line" ng-repeat="value in game.word.Options" ng-click="save(game.gameId, game.word, $index)">
+        <div class="md-list-item-text" layout="column">
+            <h3>{{ value }}</h3>
+            <h4>qwerqewreqwr</h4>
+            <p>{asdfadsfadfssadf</p>
+        </div>
+    </md-list-item>
+</md-list>

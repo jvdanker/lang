@@ -6,16 +6,19 @@ import (
 	"net/http"
 
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/satori/go.uuid"
+	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
-	"time"
-	"io"
-	"testing/iotest"
-	"encoding/binary"
 	"strings"
+	"testing/iotest"
+	"time"
+	"flag"
 )
 
 type Game struct {
@@ -65,7 +68,7 @@ func readIndex() (int, error) {
 	f, _ := os.Open("words.idx")
 	defer f.Close()
 
-	f.Seek(-2,2)
+	f.Seek(-2, 2)
 
 	b := make([]byte, 2)
 	f.Read(b)
@@ -77,7 +80,7 @@ func getOffset(line int) int64 {
 	f, _ := os.Open("words.idx")
 	defer f.Close()
 
-	f.Seek(int64(line) * int64(8),0)
+	f.Seek(int64(line)*int64(8), 0)
 
 	b := make([]byte, 8)
 	f.Read(b)
@@ -89,12 +92,12 @@ func readLine(offset int64) string {
 	f, _ := os.Open("words.txt")
 	defer f.Close()
 
-	f.Seek(offset,0)
+	f.Seek(offset, 0)
 
 	reader := bufio.NewReader(f)
 	s1, _ := reader.ReadString('\n')
 
-	return s1;
+	return s1
 }
 
 func hasWord(word string) bool {
@@ -128,8 +131,19 @@ func reindex() {
 	indexSize, _ = readIndex()
 }
 
+var app_id, app_key string
+
 func main() {
-	reindex();
+	app_id := flag.String("app-id", "", "Application ID")
+	app_key := flag.String("app-key", "", "Application Key")
+
+	flag.Parse()
+	if *app_id == "" || *app_key == "" {
+		flag.PrintDefaults()
+		os.Exit(-1)
+	}
+
+	reindex()
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", Index)
@@ -178,10 +192,10 @@ func Shuffle(a []string) int {
 
 	for i := range a {
 		j := rand.Intn(i + 1)
-		if (i == correct) {
+		if i == correct {
 			correct = j
 		}
-		if (j == correct) {
+		if j == correct {
 			correct = i
 		}
 		a[i], a[j] = a[j], a[i]
@@ -194,7 +208,7 @@ func NextWord(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	i := getNextRandom()
-	index := i[0];
+	index := i[0]
 	line := getLine(i[0])
 
 	// create three options
@@ -248,6 +262,8 @@ type test_struct struct {
 	Word2 string
 }
 
+var url string = "https://od-api.oxforddictionaries.com:443/api/v1/entries/en/"
+
 func AddWord(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var t test_struct
@@ -258,7 +274,7 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if !hasWord(t.Word1) {
-		f, err := os.OpenFile("words.txt", os.O_APPEND | os.O_WRONLY, 0600)
+		f, err := os.OpenFile("words.txt", os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
 			panic(err)
 		}
@@ -271,6 +287,59 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 
 		reindex()
 	} else {
-		http.Error(w, "Duplicate", 409)
+		http.Error(w, "Dulicate", 409)
 	}
+
+	id := uuid.NewV4().String()
+	fmt.Println(id)
+
+	// fetch definition
+	body1, code := lookup(url + t.Word1)
+	if code != 200 {
+		panic(code)
+	}
+
+	// fetch synonym
+	body2, code := lookup(url + t.Word1 + "/synonyms")
+	body3 := ""
+	if code == 200 {
+		body3 = ", \"synonyms\":" + string(body2)
+	}
+
+	// write output
+	s2 := "{\"entry\":" + string(body1) + body3 + "}"
+
+	f2, _ := os.Create("data/" + id + ".json")
+	defer f2.Close()
+	_, err = io.Copy(f2, bytes.NewReader([]byte(s2)))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Write([]byte(s2))
+}
+
+func lookup(url string) ([]byte, int) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("app_id", "1aca1eed")
+	req.Header.Add("app_key", "831583fd2dedf2b02cbe6c3f3b75549d")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	if (resp.StatusCode == 200) {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return body, resp.StatusCode
+	}
+
+	return nil, resp.StatusCode
 }

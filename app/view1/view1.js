@@ -9,30 +9,36 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', function($scope) {
+.controller('View1Ctrl', ['$scope', '$location', function($scope, $location) {
     var imagePath = 'img/list/60.jpeg';
 
     $scope.todos = [
       {
         face : imagePath,
-        what: 'Brunch this weekend?',
-        who: 'Min Li Chan',
+        what: 'Time controlled',
+        who: 'New game',
         when: '3:08PM',
-        notes: " I'll be in your neighborhood doing errands"
+        notes: "Get as many words correct in 30 seconds",
+        url: '/view2'
       },
       {
         face : imagePath,
-        what: 'Brunch this weekend?',
-        who: 'Min Li Chan',
+        what: 'Dictionary',
+        who: 'Add a new word',
         when: '3:08PM',
-        notes: " I'll be in your neighborhood doing errands"
+        notes: "Add a new word to your dictionary",
+        url: '/view4'
       },
       {
         face : imagePath,
-        what: 'Brunch this weekend?',
-        who: 'Min Li Chan',
+        what: 'Dictionary',
+        who: 'Word list',
         when: '3:08PM',
-        notes: " I'll be in your neighborhood doing errands"
+        notes: "List all of the words in your dictionary"
       },
     ];
+
+    $scope.go = function(item) {
+        $location.path(item.url);
+    };
 }]);
