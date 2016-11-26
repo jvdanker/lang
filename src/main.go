@@ -323,8 +323,8 @@ func lookup(url string) ([]byte, int) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("app_id", "1aca1eed")
-	req.Header.Add("app_key", "831583fd2dedf2b02cbe6c3f3b75549d")
+	req.Header.Add("app_id", app_id)
+	req.Header.Add("app_key", app_key)
 
 	resp, err := client.Do(req)
 	if err != nil {
