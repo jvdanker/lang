@@ -1,31 +1,29 @@
 package main
 
 import (
-	"net/http"
-	"fmt"
-	"encoding/json"
-	"os"
-	"io"
 	"bytes"
-	"log"
-	"io/ioutil"
+	"encoding/json"
+	"fmt"
 	"github.com/satori/go.uuid"
+	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 )
+
+var url string = "https://od-api.oxforddictionaries.com:443/api/v1/entries/en/"
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome!")
 }
 
 func TodoIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	game := Game{Id: uuid.NewV4().String()}
 	json.NewEncoder(w).Encode(game)
 }
 
 func NextWord(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	i := getNextRandom()
 	index := i[0]
 	line := getLine(i[0])
@@ -47,8 +45,6 @@ func NextWord(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(word)
 }
-
-var url string = "https://od-api.oxforddictionaries.com:443/api/v1/entries/en/"
 
 func AddWord(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
@@ -121,7 +117,7 @@ func lookup(url string) ([]byte, int) {
 	}
 	defer resp.Body.Close()
 
-	if (resp.StatusCode == 200) {
+	if resp.StatusCode == 200 {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatal(err)

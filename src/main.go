@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"os"
 	"flag"
 	"github.com/gorilla/mux"
+	"os"
 )
 
 var app_id, app_key string

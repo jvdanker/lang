@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
-	"encoding/binary"
 	"bufio"
-	"log"
-	"strings"
+	"encoding/binary"
 	"io"
-	"testing/iotest"
+	"log"
 	"math/rand"
+	"os"
+	"strings"
+	"testing/iotest"
 	"time"
 )
 
