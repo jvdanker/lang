@@ -1,133 +1,82 @@
 package main
 
 import (
-	"bufio"
-	"encoding/binary"
-	"io"
-	"log"
+	"fmt"
 	"math/rand"
 	"os"
-	"strings"
-	"testing/iotest"
+	"path/filepath"
 	"time"
 )
-
-var indexSize int = 0
 
 type Game struct {
 	Id string
 }
 
 type Word struct {
-	Index   int
+	Index   int `json:"index"`
 	Word    string
 	Options []string
 	Correct int
 }
 
 type test_struct struct {
-	Word1 string
+	Word1 string `json:"word1"`
 	Word2 string
 }
 
-func createIndex() {
-	f, _ := os.Open("words.txt")
-	defer f.Close()
-	reader := bufio.NewReader(f)
-
-	f2, _ := os.Create("words.idx")
-	defer f2.Close()
-
-	var count int16 = 0
-	var index int64 = 0
-	for {
-		s1, err := reader.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil && err != iotest.ErrTimeout {
-			panic("GetLines: " + err.Error())
-		}
-
-		b := make([]byte, 8)
-		binary.LittleEndian.PutUint64(b, uint64(index))
-		f2.Write(b)
-
-		count++
-		index += int64(len(s1))
-	}
-
-	b := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b, uint16(count))
-	f2.Write(b)
+type Index struct {
+	Test string
 }
 
-func readIndex() (int, error) {
-	f, _ := os.Open("words.idx")
-	defer f.Close()
+var indexSize int = 0
+var files []string
 
-	f.Seek(-2, 2)
-
-	b := make([]byte, 2)
-	f.Read(b)
-
-	return int(binary.LittleEndian.Uint16(b)), nil
-}
-
-func getOffset(line int) int64 {
-	f, _ := os.Open("words.idx")
-	defer f.Close()
-
-	f.Seek(int64(line)*int64(8), 0)
-
-	b := make([]byte, 8)
-	f.Read(b)
-
-	return int64(binary.LittleEndian.Uint64(b))
-}
-
-func readLine(offset int64) string {
-	f, _ := os.Open("words.txt")
-	defer f.Close()
-
-	f.Seek(offset, 0)
-
-	reader := bufio.NewReader(f)
-	s1, _ := reader.ReadString('\n')
-
-	return s1
-}
-
-func hasWord(word string) bool {
-	file, err := os.Open("words.txt")
+func (i *Index) Reindex() {
+	dirname := "data" + string(filepath.Separator)
+	d, err := os.Open(dirname)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	defer file.Close()
+	defer d.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		s := scanner.Text()
-		parts := strings.Split(s, "\t")
+	fi, err := d.Readdir(-1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-		if strings.Compare(parts[0], word) == 0 {
-			return true
+	indexSize = len(fi)
+	for _, fi := range fi {
+		if fi.Mode().IsRegular() {
+			files = append(files, fi.Name())
 		}
 	}
+}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+func (i *Index) GetNextRandom() []int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	m := make(map[int]bool)
+	for len(m) < 3 {
+		rand := r.Intn(indexSize - 1)
+		if _, ok := m[rand]; ok == false {
+			m[rand] = true
+		}
+
 	}
 
-	return false
+	temp := make([]int, 3)
+	x := 0
+	for key := range m {
+		temp[x] = key
+		x++
+	}
+
+	return temp
 }
 
-func reindex() {
-	createIndex()
-	indexSize, _ = readIndex()
-}
-
-func Shuffle(a []string) int {
+func (i *Index) Shuffle(a []string) int {
 	var correct int = 0
 
 	for i := range a {
@@ -144,30 +93,21 @@ func Shuffle(a []string) int {
 	return correct
 }
 
-func getNextRandom() []int {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func (i *Index) GetLine(index int) []string {
+	f, _ := os.Open("data/" + files[index])
 
-	m := make(map[int]bool)
-	for len(m) < 3 {
-		rand := r.Intn(indexSize)
-		if _, ok := m[rand]; ok == false {
-			m[rand] = true
-		}
-
+	d, err := NewDictFromReader(f)
+	if err != nil {
+		panic(err)
 	}
 
-	temp := make([]int, 3)
-	i := 0
-	for key := range m {
-		temp[i] = key
-		i++
-	}
+	s := make([]string, 2)
+	s[0] = d.word
+	s[1] = d.definition
 
-	return temp
+	return s
 }
 
-func getLine(index int) []string {
-	s := readLine(getOffset(index))
-	parts := strings.Split(s, "\t")
-	return parts
+func (i *Index) HasWord(word string) bool {
+	return false
 }

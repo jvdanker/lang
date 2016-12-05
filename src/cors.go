@@ -23,6 +23,7 @@ func (s *WithCORS) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "OPTIONS" {
 		return
 	}
+
 	// Lets Gorilla work
 	s.r.ServeHTTP(res, req)
 }

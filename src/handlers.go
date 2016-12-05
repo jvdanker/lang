@@ -14,30 +14,31 @@ import (
 
 var url string = "https://od-api.oxforddictionaries.com:443/api/v1/entries/en/"
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome!")
-}
-
 func TodoIndex(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+
 	game := Game{Id: uuid.NewV4().String()}
-	json.NewEncoder(w).Encode(game)
+	if err := json.NewEncoder(w).Encode(game); err != nil {
+		panic(err)
+	}
 }
 
 func NextWord(w http.ResponseWriter, r *http.Request) {
-	i := getNextRandom()
-	index := i[0]
-	line := getLine(i[0])
+	i := index.GetNextRandom()
+	idx := i[0]
+	line := index.GetLine(i[0])
 
 	// create three options
 	options := make([]string, 3)
 	options[0] = line[1]
-	options[1] = getLine(i[1])[1]
-	options[2] = getLine(i[2])[1]
+	options[1] = index.GetLine(i[1])[1]
+	options[2] = index.GetLine(i[2])[1]
 
-	correct := Shuffle(options)
+	correct := index.Shuffle(options)
 
 	word := Word{
-		Index:   index,
+		Index:   idx,
 		Word:    line[0],
 		Options: options,
 		Correct: correct,
@@ -55,7 +56,7 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if !hasWord(t.Word1) {
+	if !index.HasWord(t.Word1) {
 		f, err := os.OpenFile("words.txt", os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
 			panic(err)
@@ -66,8 +67,6 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 		if _, err = f.WriteString(t.Word1 + "\t" + t.Word2 + "\n"); err != nil {
 			panic(err)
 		}
-
-		reindex()
 	} else {
 		http.Error(w, "Dulicate", 409)
 	}
@@ -98,6 +97,8 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(s2))
 }
 

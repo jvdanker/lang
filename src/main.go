@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"flag"
-	"github.com/gorilla/mux"
 	"os"
 )
 
 var app_id, app_key string
+var index = Index{}
 
 func main() {
 	app_id := flag.String("app-id", "", "Application ID")
@@ -21,13 +21,7 @@ func main() {
 		os.Exit(-1)
 	}
 
-	reindex()
+	index.Reindex()
 
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", Index)
-	router.HandleFunc("/v1/game/new", TodoIndex)
-	router.HandleFunc("/v1/game/word", NextWord)
-	router.HandleFunc("/v1/game/word/add", AddWord).Methods("POST")
-
-	log.Fatal(http.ListenAndServe(":8080", &WithCORS{router}))
+	log.Fatal(http.ListenAndServe(":8080", &WithCORS{NewRouter()}))
 }
