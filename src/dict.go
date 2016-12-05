@@ -48,6 +48,10 @@ func get(data interface{}, path []string, result *list) {
 		switch v.Kind() {
 		case reflect.Map:
 			data = data.(map[string]interface{})[part]
+			if data == nil {
+				return
+			}
+
 			if reflect.TypeOf(data).Kind() == reflect.Slice {
 				for _, part2 := range data.([]interface{}) {
 					get(part2, path[i+1:], result)

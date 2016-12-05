@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
@@ -12,7 +11,7 @@ import (
 	"os"
 )
 
-var url string = "https://od-api.oxforddictionaries.com:443/api/v1/entries/en/"
+var url string = "https://od-api.oxforddictionaries.com/api/v1/entries/en/"
 
 func TodoIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -52,71 +51,70 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 	var t test_struct
 	err := decoder.Decode(&t)
 	if err != nil {
-		panic(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 	defer r.Body.Close()
 
-	if !index.HasWord(t.Word1) {
-		f, err := os.OpenFile("words.txt", os.O_APPEND|os.O_WRONLY, 0600)
-		if err != nil {
-			panic(err)
-		}
-
-		defer f.Close()
-
-		if _, err = f.WriteString(t.Word1 + "\t" + t.Word2 + "\n"); err != nil {
-			panic(err)
-		}
-	} else {
-		http.Error(w, "Dulicate", 409)
+	if index.HasWord(t.Word1) {
+		http.Error(w, "Conflict", http.StatusConflict)
+		return
 	}
-
-	id := uuid.NewV4().String()
-	fmt.Println(id)
 
 	// fetch definition
 	body1, code := lookup(url + t.Word1)
 	if code != 200 {
-		panic(code)
+		log.Fatal(code)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
 	// fetch synonym
 	body2, code := lookup(url + t.Word1 + "/synonyms")
-	body3 := ""
-	if code == 200 {
-		body3 = ", \"synonyms\":" + string(body2)
+	if code != 200 {
+		log.Fatal(code)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
 	// write output
-	s2 := "{\"entry\":" + string(body1) + body3 + "}"
+	s2 := "{\"entry\":" + string(body1) + ", \"synonyms\":" + string(body2) + "}"
 
-	f2, _ := os.Create("data/" + id + ".json")
+	id := uuid.NewV4().String()
+	f2, err := os.Create("data/" + id + ".json")
+	if err != nil {
+		log.Fatal(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
 	defer f2.Close()
 	_, err = io.Copy(f2, bytes.NewReader([]byte(s2)))
 	if err != nil {
 		log.Fatal(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(s2))
+	index.Reindex()
 }
 
 func lookup(url string) ([]byte, int) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("app_id", app_id)
-	req.Header.Add("app_key", app_key)
-
-	fmt.Println("id = ", app_id)
-	return nil, 404
+	req.Header.Add("app_id", *app_id)
+	req.Header.Add("app_key", *app_key)
 
 	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
 	defer resp.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+		return nil, resp.StatusCode
+	}
 
 	if resp.StatusCode == 200 {
 		body, err := ioutil.ReadAll(resp.Body)

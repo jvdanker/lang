@@ -12,10 +12,9 @@ angular.module('myApp.view4', ['ngRoute'])
 .controller('View4Ctrl', ['$scope', '$location', '$http', 'words', function($scope, $location, $http, words) {
     $scope.words = {};
 
-    $scope.save = function(words) {
+    $scope.save = function(word) {
         $http.post('http://localhost:8080/v1/game/word/add', {
-            Word1: words.word1,
-            Word2: words.word2
+            Word1: word
         }).then(function() {
             $location.path( '/view1' );
         });
