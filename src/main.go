@@ -23,5 +23,6 @@ func main() {
 
 	index.Reindex()
 
+	log.Println("Started server and listening at port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", &WithCORS{NewRouter()}))
 }
