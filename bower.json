@@ -12,6 +12,7 @@
     "angular-loader": "~1.5.8",
     "angular-mocks": "~1.5.8",
     "html5-boilerplate": "^5.3.0",
-    "angular-material": "1.1.1"
+    "angular-material": "1.1.1",
+    "material-design-icons": "3.0.1"
   }
 }

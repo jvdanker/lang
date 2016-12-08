@@ -20,4 +20,8 @@ angular.module('myApp.view4', ['ngRoute'])
         });
     };
 
+    $scope.back = function() {
+        $location.path("/");
+    };
+
 }]);

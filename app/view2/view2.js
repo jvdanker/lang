@@ -31,4 +31,8 @@ angular.module('myApp.view2', ['ngRoute'])
             $scope.message = 'incorrect';
         }
     };
+
+    $scope.back = function() {
+        $location.path("/");
+    };
 }]);

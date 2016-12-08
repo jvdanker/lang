@@ -11,4 +11,8 @@ angular.module('myApp.view3', ['ngRoute'])
 
 .controller('View3Ctrl', ['$scope', '$location', 'game', function($scope, $location, game) {
     $scope.results = game.getResults();
+
+    $scope.back = function() {
+        $location.path("/");
+    };
 }]);

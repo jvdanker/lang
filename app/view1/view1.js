@@ -14,28 +14,24 @@ angular.module('myApp.view1', ['ngRoute'])
 
     $scope.todos = [
       {
-        face : imagePath,
         what: 'Time controlled',
         who: 'New game',
-        when: '3:08PM',
         notes: "Get as many words correct in 30 seconds",
         url: '/view2'
       },
       {
-        face : imagePath,
         what: 'Dictionary',
         who: 'Add a new word',
-        when: '3:08PM',
         notes: "Add a new word to your dictionary",
         url: '/view4'
       },
+      /*
       {
-        face : imagePath,
         what: 'Dictionary',
         who: 'Word list',
-        when: '3:08PM',
         notes: "List all of the words in your dictionary"
       },
+      */
     ];
 
     $scope.go = function(item) {

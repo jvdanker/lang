@@ -1,3 +1,11 @@
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="Settings" ng-disabled="false" ng-click="back()">
+            <i class="material-icons">arrow_back</i>
+        </md-button>
+    </div>
+</md-toolbar>
+
 <md-list flex>
     <md-subheader class="md-no-sticky">{{game.word.Word}}</md-subheader>
     <md-list-item class="md-2-line" ng-repeat="value in game.word.Options" ng-click="save(game.gameId, game.word, $index)">
