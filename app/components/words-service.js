@@ -7,7 +7,6 @@ factory('game', ['$http', '$q', 'words', function($http, $q, words) {
     return {
         newGame: function() {
             console.log('new game');
-            i = 1;
 
             return $http.get('http://localhost:8080/v1/game/new').then(function (response) {
                 var id = response.data.Id;
@@ -24,11 +23,6 @@ factory('game', ['$http', '$q', 'words', function($http, $q, words) {
             return;
         },
         nextWord: function(gameId) {
-            if (i === 3) {
-                return $q.when();
-            }
-
-            i++;
             return words.getNext(gameId);
         },
         getResults: function(gameId) {

@@ -9,7 +9,7 @@ angular.module('myApp.view2', ['ngRoute'])
   });
 }])
 
-.controller('View2Ctrl', ['$scope', '$location', 'game', 'words', function($scope, $location, game, words) {
+.controller('View2Ctrl', ['$scope', '$location', '$interval', 'game', 'words', function($scope, $location, $interval, game, words) {
     game.newGame().then(function (game) {
         $scope.game = game;
     });
@@ -35,4 +35,26 @@ angular.module('myApp.view2', ['ngRoute'])
     $scope.back = function() {
         $location.path("/");
     };
+
+    var stopTime = $interval(updateTime, 1000);
+    var startTime = new Date();
+    var seconds = 0;
+
+    // used to update the UI
+    function updateTime() {
+        seconds = Math.round((new Date() - startTime) / 1000);
+        $scope.seconds = seconds;
+
+        if (seconds > 30) {
+            $interval.cancel(stopTime);
+            $location.path( '/view3' );
+        }
+    }
+
+    // listen on DOM destroy (removal) event, and cancel the next UI update
+    // to prevent updating time after the DOM element was removed.
+    $scope.$on('$destroy', function() {
+        $interval.cancel(stopTime);
+    });
+
 }]);

@@ -23,3 +23,19 @@
   content: "|";
   padding-right: 0.3em;
 }
+
+body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+md-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+h1 {
+    margin-left: 15px;
+}
