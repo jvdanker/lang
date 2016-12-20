@@ -20,12 +20,8 @@ angular.module('myApp.view2', ['ngRoute'])
         var result = game.saveAnswer(gameId, word, answer);
 
         if (answer == word.Correct) {
-            $scope.game.word = game.nextWord(gameId).then(function(word) {
-                if (word === undefined) {
-                    $location.path( '/view3' );
-                } else {
-                    $scope.game.word = word;
-                }
+            game.nextWord(gameId).then(function(word) {
+                $scope.game.word = word;
             });
         } else {
             $scope.message = 'incorrect';

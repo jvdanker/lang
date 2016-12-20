@@ -47,6 +47,7 @@ func (i *Index) Reindex() {
 	}
 
 	indexSize = len(fi)
+	files = nil
 	for _, fi := range fi {
 		if fi.Mode().IsRegular() {
 			files = append(files, fi.Name())

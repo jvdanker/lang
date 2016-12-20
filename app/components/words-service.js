@@ -6,9 +6,7 @@ factory('game', ['$http', '$q', 'words', function($http, $q, words) {
 
     return {
         newGame: function() {
-            console.log('new game');
-
-            return $http.get('http://localhost:8080/v1/game/new').then(function (response) {
+            return $http.get('/v1/game/new').then(function (response) {
                 var id = response.data.Id;
                 return words.getNext(id).then(function(data) {
                     return {
@@ -19,7 +17,7 @@ factory('game', ['$http', '$q', 'words', function($http, $q, words) {
             });
         },
         saveAnswer: function(gameId, word, answer) {
-            console.log('save answer', gameId, word, answer);
+            // console.log('save answer', gameId, word, answer);
             return;
         },
         nextWord: function(gameId) {
@@ -38,7 +36,7 @@ factory('words', ['$http', function($http) {
             console.log('reset');
         },
         getNext: function(gameId) {
-            return $http.get('http://localhost:8080/v1/game/word').then(function(data) {
+            return $http.get('/v1/game/word').then(function(data) {
                 return data.data;
             });
         }

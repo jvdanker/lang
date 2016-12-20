@@ -13,7 +13,7 @@ angular.module('myApp.view4', ['ngRoute'])
     $scope.words = {};
 
     $scope.save = function(word) {
-        $http.post('http://localhost:8080/v1/game/word/add', {
+        $http.post('/v1/game/word/add', {
             Word1: word
         }).then(function() {
             $location.path( '/view1' );
