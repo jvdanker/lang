@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"flag"
+	"github.com/gorilla/handlers"
 	"os"
+	"time"
 )
 
 var app_id, app_key *string
@@ -27,5 +29,13 @@ func main() {
 	index.Reindex()
 
 	log.Println("Started server and listening at port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", &WithCORS{NewRouter()}))
+
+	srv := &http.Server{
+		Handler:      handlers.CompressHandler(&WithCORS{NewRouter()}),
+		Addr:         ":8080",
+		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  10 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }

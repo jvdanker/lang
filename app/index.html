@@ -11,12 +11,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="onlyWebPro" />
+    <meta name="apple-mobile-web-app-title" content="Language Trainer" />
+
+    <!--
+    <link rel="apple-touch-icon" href="apple-touch-icon-iphone.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="touch-icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png">
+
+    <link rel="apple-touch-startup-image" href="iphone-startup.png">
+    <link rel="apple-touch-startup-image" href="ipad-landscape-startup.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
+    <link rel="apple-touch-startup-image" href="ipad-portrait-startup.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
+    -->
+
     <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
     <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="app.css">
+
     <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 <body>
@@ -25,20 +38,11 @@
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-
-
 <md-content>
-
     <div ng-view ng-cloak style="display: flex; flex-direction: column; flex: 1"></div>
-
 </md-content>
 
-
-
-<!-- In production use:
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
--->
-<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular/angular.min.js"></script>
 <script src="bower_components/angular-aria/angular-aria.js"></script>
 <script src="bower_components/angular-animate/angular-animate.js"></script>
 <script src="bower_components/angular-material/angular-material.js"></script>
