@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
@@ -64,7 +65,7 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 	// fetch definition
 	body1, code := lookup(url + t.Word1)
 	if code != 200 {
-		log.Fatal(code)
+		log.Println(code)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -72,7 +73,7 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 	// fetch synonym
 	body2, code := lookup(url + t.Word1 + "/synonyms")
 	if code != 200 {
-		log.Fatal(code)
+		log.Println(code)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -125,6 +126,6 @@ func lookup(url string) ([]byte, int) {
 		return body, resp.StatusCode
 	}
 
-	log.Fatal(resp.StatusCode)
+	log.Println(resp.StatusCode)
 	return nil, resp.StatusCode
 }
