@@ -32,7 +32,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      handlers.CompressHandler(&WithCORS{NewRouter()}),
-		Addr:         ":8080",
+		Addr:         "127.0.0.1:8080",
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
